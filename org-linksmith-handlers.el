@@ -4,7 +4,7 @@
 
 ;; Author: Greg Lucas <greg@glucas.net>
 ;; Keywords: convenience, org
-;; Package-Requires: ((emacs "27.1") (org-linksmith "0.1"))
+;; Package-Requires: ((emacs "27.1"))
 ;; URL: https://github.com/glucas/org-linksmith
 
 ;; This program is free software; you can redistribute it and/or modify
