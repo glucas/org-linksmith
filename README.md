@@ -63,10 +63,42 @@ of the built-in Jira issue handler:
 ```
 
 For a handler that needs a user-configurable lookup table (e.g.
-mapping an account ID or slug in the URL to a friendly name), define a
-`defcustom` alist and consult it from `:format` — see the built-in
-handlers for examples of extracting path segments, query parameters,
-and URL fragments with `url-parse` / `url-util`.
+mapping an account or workspace ID in the URL to a friendly name),
+define a `defcustom` alist and consult it from `:format`. This one
+also pulls a report name from the query string and a section anchor
+from the fragment, using `url-parse` / `url-util`:
+
+``` emacs-lisp
+(defcustom my-example-workspace-names '()
+  "Alist mapping Example workspace IDs to display names.
+Example: ((\"ws-42\" . \"prod\") (\"ws-99\" . \"staging\"))"
+  :type '(alist :key-type string :value-type string))
+
+(defun my-example-dashboard-match (url)
+  (string-match-p "^https://example\\.com/dashboards/" url))
+
+(defun my-example-dashboard-format (url)
+  (let* ((parsed    (url-generic-parse-url url))
+         (path      (car (split-string (url-filename parsed) "?" t)))
+         (query-str (cadr (split-string (url-filename parsed) "?" t)))
+         (query     (when query-str (url-parse-query-string query-str)))
+         (ws-id     (nth 1 (split-string path "/" t)))
+         (ws-name   (or (cdr (assoc ws-id my-example-workspace-names)) ws-id))
+         (report    (cadr (assoc "report" query)))
+         (anchor    (url-target parsed)))
+    (list :url url
+          :desc (concat "Example: " ws-name
+                        (when report (concat ": " report))
+                        (when anchor (concat " @ " anchor))))))
+
+(org-linksmith-register-handler
+ (list :name   "Example dashboard"
+       :match  #'my-example-dashboard-match
+       :format #'my-example-dashboard-format))
+```
+
+See the built-in Confluence handler in `org-linksmith-handlers.el` for
+another example of extracting path segments with `url-parse`.
 
 Register your own handlers in your init file, after requiring
 `org-linksmith-handlers` if you want the built-ins too:
