@@ -91,14 +91,15 @@ Example: ((\"ws-42\" . \"prod\") (\"ws-99\" . \"staging\"))"
   (string-match-p "^https://example\\.com/dashboards/" url))
 
 (defun my-example-dashboard-format (url)
-  (let* ((parsed    (url-generic-parse-url url))
-         (path      (car (split-string (url-filename parsed) "?" t)))
-         (query-str (cadr (split-string (url-filename parsed) "?" t)))
-         (query     (when query-str (url-parse-query-string query-str)))
-         (ws-id     (nth 1 (split-string path "/" t)))
-         (ws-name   (or (cdr (assoc ws-id my-example-workspace-names)) ws-id))
-         (report    (cadr (assoc "report" query)))
-         (anchor    (url-target parsed)))
+  (let* ((parsed     (url-generic-parse-url url))
+         (path+query (split-string (url-filename parsed) "?" t))
+         (path       (car path+query))
+         (query      (when (cadr path+query)
+                       (url-parse-query-string (cadr path+query))))
+         (ws-id      (nth 1 (split-string path "/" t)))
+         (ws-name    (or (cdr (assoc ws-id my-example-workspace-names)) ws-id))
+         (report     (cadr (assoc "report" query)))
+         (anchor     (url-target parsed)))
     (list :url url
           :desc (concat "Example: " ws-name
                         (when report (concat ": " report))
