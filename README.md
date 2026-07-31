@@ -3,6 +3,19 @@
 Turn a clipboard URL into a legible Org link — `[[https://github.com/foo/bar/pull/42][PR: foo/bar#42]]`
 instead of the raw URL — via a small handler registry.
 
+## Installation
+
+Not yet on MELPA — install straight from the repo with `use-package`'s
+built-in `:vc` support (Emacs 30+).
+
+``` emacs-lisp
+(use-package org-linksmith
+  :vc (:url "https://github.com/glucas/org-linksmith" :rev :newest)
+  :config
+  ;; Optional: Register the default handlers
+  (require 'org-linksmith-handlers))
+```
+
 ## Commands
 
 - `org-linksmith-insert-from-clipboard` — insert a formatted link at point
