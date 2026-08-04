@@ -1,4 +1,4 @@
-;;; org-linksmith-test.el --- ERT tests for org-linksmith core -*- lexical-binding: t; -*-
+;;; org-linksmith-tests.el --- ERT tests for org-linksmith core -*- lexical-binding: t; -*-
 
 (require 'ert)
 (require 'org-linksmith)
@@ -76,5 +76,5 @@
   (should (equal (org-linksmith--org-link "https://example.com" "Example")
                  "[[https://example.com][Example]]")))
 
-(provide 'org-linksmith-test)
-;;; org-linksmith-test.el ends here
+(provide 'org-linksmith-tests)
+;;; org-linksmith-tests.el ends here

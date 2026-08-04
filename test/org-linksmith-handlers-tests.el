@@ -1,4 +1,4 @@
-;;; org-linksmith-handlers-test.el --- ERT tests for org-linksmith built-in handlers -*- lexical-binding: t; -*-
+;;; org-linksmith-handlers-tests.el --- ERT tests for org-linksmith built-in handlers -*- lexical-binding: t; -*-
 
 (require 'ert)
 (require 'org-linksmith-handlers)
@@ -112,5 +112,5 @@
     (should (equal (plist-get props :url) url))
     (should (equal (plist-get props :desc) "ChatGPT"))))
 
-(provide 'org-linksmith-handlers-test)
-;;; org-linksmith-handlers-test.el ends here
+(provide 'org-linksmith-handlers-tests)
+;;; org-linksmith-handlers-tests.el ends here
