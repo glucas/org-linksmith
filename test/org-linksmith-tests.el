@@ -30,10 +30,28 @@
     (let ((props (org-linksmith--format "https://example.com/foo")))
       (should (equal (plist-get props :desc) "Example")))))
 
-(ert-deftest org-linksmith-format/errors-on-no-match ()
+(ert-deftest org-linksmith-format/falls-back-on-no-match ()
+  "Uses `org-linksmith-fallback-format-function' when no handler matches."
   (let ((org-linksmith-handlers
          (list (list :name "A" :match (lambda (_) nil)
                      :format (lambda (url) (list :url url :desc "A"))))))
+    (let ((props (org-linksmith--format "https://example.com")))
+      (should (equal props '(:url "https://example.com" :desc "https://example.com"))))))
+
+(ert-deftest org-linksmith-format/uses-custom-fallback ()
+  (let ((org-linksmith-handlers
+         (list (list :name "A" :match (lambda (_) nil)
+                     :format (lambda (url) (list :url url :desc "A")))))
+        (org-linksmith-fallback-format-function
+         (lambda (url) (list :url url :desc "Custom"))))
+    (let ((props (org-linksmith--format "https://example.com")))
+      (should (equal (plist-get props :desc) "Custom")))))
+
+(ert-deftest org-linksmith-format/errors-on-no-match-when-fallback-disabled ()
+  (let ((org-linksmith-handlers
+         (list (list :name "A" :match (lambda (_) nil)
+                     :format (lambda (url) (list :url url :desc "A")))))
+        (org-linksmith-fallback-format-function nil))
     (should-error (org-linksmith--format "https://example.com")
                   :type 'user-error)))
 

@@ -122,3 +122,18 @@ Register your own handlers in your init file, after requiring
 (require 'org-linksmith-handlers)
 ;; then your own org-linksmith-register-handler calls
 ```
+
+## Fallback for unmatched URLs
+
+When no handler matches, `org-linksmith-fallback-format-function` is called. The default makes a
+bare link (`(:url url :desc url)`). Set it to nil to signal a `user-error`, or point it at your own
+formatter.
+
+For example, to fall back to [org-cliplink](https://github.com/rexim/org-cliplink) for a
+fetched page title:
+
+``` emacs-lisp
+(setq org-linksmith-fallback-format-function
+      (lambda (url)
+        (list :url url :desc (org-cliplink-retrieve-title-synchronously url))))
+```

@@ -38,6 +38,8 @@
 ;; `org-linksmith-handlers' for a set of handlers for common services
 ;; (GitHub, Jira, Confluence, ChatGPT), or register your own.  See the
 ;; README for a worked example of writing and registering a handler.
+;;
+;; When no handler matches, `org-linksmith-fallback-format-function' is used.
 
 ;;; Code:
 
@@ -53,6 +55,20 @@
 (defcustom org-linksmith-default-capture-template "xl"
   "Default org-capture template key used by `org-linksmith-capture-url'."
   :type 'string
+  :group 'org-linksmith)
+
+(defun org-linksmith-default-fallback (url)
+  "Fallback :format function: a bare link, URL used as both link and desc."
+  (list :url url :desc url))
+
+(defcustom org-linksmith-fallback-format-function #'org-linksmith-default-fallback
+  "Function used to format URL when no handler in `org-linksmith-handlers' matches.
+Called with one argument, the URL string; must return a plist with :url
+and :desc, the same shape a handler's :format function returns.
+
+Set to nil to signal a `user-error' when no handler matches."
+  :type '(choice (const :tag "Signal an error" nil)
+                 function)
   :group 'org-linksmith)
 
 ;;; Handler Registry
@@ -90,11 +106,14 @@ system clipboard."
 
 (defun org-linksmith--format (url)
   "Return a :url/:desc plist for URL using the handler registry.
-Signals `user-error' if no handler matches."
+Falls back to `org-linksmith-fallback-format-function' when no handler
+matches; signals `user-error' if that is nil."
   (let ((handler (org-linksmith--find-handler url)))
-    (unless handler
-      (user-error "No linksmith handler matched: %s" url))
-    (funcall (plist-get handler :format) url)))
+    (cond
+     (handler (funcall (plist-get handler :format) url))
+     (org-linksmith-fallback-format-function
+      (funcall org-linksmith-fallback-format-function url))
+     (t (user-error "No linksmith handler matched: %s" url)))))
 
 (defun org-linksmith--format-from-clipboard ()
   "Return a :url/:desc plist for the current clipboard URL."
