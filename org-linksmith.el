@@ -29,6 +29,7 @@
 ;;   `org-linksmith-insert-url'              — insert [[url][desc]] for a given URL
 ;;   `org-linksmith-insert-from-clipboard'    — insert [[url][desc]] at point
 ;;   `org-linksmith-store-from-clipboard'     — store as Org link (for %a in templates)
+;;   `org-linksmith-format-from-clipboard'    — return formatted link (for %() in templates)
 ;;   `org-linksmith-capture-with-clipboard-link' — store + org-capture
 ;;
 ;; Register handlers with `org-linksmith-register-handler'.  Each handler
@@ -154,9 +155,10 @@ next capture.  Signals `user-error' if no handler matches."
   (interactive)
   (org-linksmith-store (org-linksmith--clipboard-string)))
 
-(defun org-linksmith--capture-clipboard ()
+;;;###autoload
+(defun org-linksmith-format-from-clipboard ()
   "Return a formatted Org link for the clipboard URL.
-For use in capture templates via %(org-linksmith--capture-clipboard).
+For use in capture templates via %(org-linksmith-format-from-clipboard).
 Returns an error placeholder string rather than signaling, so template
 fill does not abort."
   (condition-case err
