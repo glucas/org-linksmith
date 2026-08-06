@@ -18,6 +18,7 @@ built-in `:vc` support (Emacs 30+).
 
 ## Commands
 
+- `org-linksmith-insert-url` — insert a formatted link at point for a given URL
 - `org-linksmith-insert-from-clipboard` — insert a formatted link at point
 - `org-linksmith-format-url-at-point` — reformat the raw URL at/before point in place
 - `org-linksmith-store-from-clipboard` — store as an Org link, for `%a` in capture templates

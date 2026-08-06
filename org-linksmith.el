@@ -26,8 +26,9 @@
 ;; Turn clipboard URLs into legible Org links via a handler registry.
 ;;
 ;; Commands:
-;;   `org-linksmith-insert-from-clipboard'  — insert [[url][desc]] at point
-;;   `org-linksmith-store-from-clipboard'   — store as Org link (for %a in templates)
+;;   `org-linksmith-insert-url'              — insert [[url][desc]] for a given URL
+;;   `org-linksmith-insert-from-clipboard'    — insert [[url][desc]] at point
+;;   `org-linksmith-store-from-clipboard'     — store as Org link (for %a in templates)
 ;;   `org-linksmith-capture-with-clipboard-link' — store + org-capture
 ;;
 ;; Register handlers with `org-linksmith-register-handler'.  Each handler
@@ -115,10 +116,6 @@ matches; signals `user-error' if that is nil."
       (funcall org-linksmith-fallback-format-function url))
      (t (user-error "No linksmith handler matched: %s" url)))))
 
-(defun org-linksmith--format-from-clipboard ()
-  "Return a :url/:desc plist for the current clipboard URL."
-  (org-linksmith--format (org-linksmith--clipboard-string)))
-
 (defun org-linksmith--org-link (url desc)
   "Return an Org link string [[URL][DESC]]."
   (format "[[%s][%s]]" url desc))
@@ -126,13 +123,18 @@ matches; signals `user-error' if that is nil."
 ;;; Commands
 
 ;;;###autoload
+(defun org-linksmith-insert-url (url)
+  "Insert a formatted Org link for URL at point."
+  (interactive "sURL: ")
+  (let* ((props (org-linksmith--format url))
+         (desc  (plist-get props :desc)))
+    (insert (org-linksmith--org-link (plist-get props :url) desc))))
+
+;;;###autoload
 (defun org-linksmith-insert-from-clipboard ()
   "Insert a formatted Org link for the clipboard URL at point."
   (interactive)
-  (let* ((props (org-linksmith--format-from-clipboard))
-         (url   (plist-get props :url))
-         (desc  (plist-get props :desc)))
-    (insert (org-linksmith--org-link url desc))))
+  (org-linksmith-insert-url (org-linksmith--clipboard-string)))
 
 (defun org-linksmith-store (url)
   "Store URL as an Org link via the handler registry.

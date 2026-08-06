@@ -55,6 +55,17 @@
     (should-error (org-linksmith--format "https://example.com")
                   :type 'user-error)))
 
+;;; insert-url command
+
+(ert-deftest org-linksmith-insert-url/inserts-formatted-link ()
+  (let ((org-linksmith-handlers
+         (list (list :name "Test" :match (lambda (_) t)
+                     :format (lambda (url) (list :url url :desc "Example"))))))
+    (with-temp-buffer
+      (org-linksmith-insert-url "https://example.com/foo")
+      (should (equal (buffer-string)
+                     "[[https://example.com/foo][Example]]")))))
+
 ;;; format-url-at-point command
 
 (ert-deftest org-linksmith-format-url-at-point/replaces-url-at-point ()
